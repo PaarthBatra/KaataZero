@@ -54,7 +54,7 @@ public class callGUI extends JFrame {
     protected JLabel scoreLabel = new JLabel();
     protected int final_height = 350;
     protected int final_width = 350;
-    protected JLabel levelLabel = new JLabel("<html><a href='http://www.versionpb.com'>www.versionpb.com</a></html>");
+    protected JLabel levelLabel = new JLabel("<html><a href='http://www.versionpb.co.in'>www.versionpb.co.in</a></html>");
     public callGUI() {
         
         GameRunning = false;
@@ -68,7 +68,7 @@ public class callGUI extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
-                    Desktop.getDesktop().browse(new URI("http://www.versionpb.com"));
+                    Desktop.getDesktop().browse(new URI("http://www.versionpb.co.in"));
                 } catch (URISyntaxException | IOException ex) {
                     //It looks like there's a problem
                 }
@@ -123,10 +123,10 @@ public class callGUI extends JFrame {
                 JLabel lbl = new JLabel(new ImageIcon((newimg)));
                 JLabel a = new JLabel("<html>Kaata Zero: <br>"
                         + "Kaata Zero is te best way to pass time <br><br> Author : Paarth Batra<br>Version : 1.0.0.0<br>Release Date : 7th Dec 2015<br><br>Contact:"
-                        + "paarth_batra@yahoo.co.in<br>paarthh2@rediffmail.com<hr><hr>www.versionpb.com<br>Its all about what do you want ! <br> Sno: 201512070000007</html>");
+                        + "paarth_batra@yahoo.co.in<br>paarthh2@rediffmail.com<hr><hr>www.versionpb.co.in<br>Its all about what do you want ! <br> Sno: 201512070000007</html>");
                 //GridLayout experimentLayout = new GridLayout(4,4,5,2);
                 JPanel p = new JPanel();
-                  JLabel b = new JLabel("<html>www.versionpb.com<br>Its all about what do you want !<br> Sno: 201512070000007</html>");
+                  JLabel b = new JLabel("<html>www.versionpb.co.in<br>Its all about what do you want !<br> Sno: 201512070000007</html>");
                 //p.setLayout(experimentLayout);
                 p.add(a,BorderLayout.EAST);
                 p.add(lbl,BorderLayout.CENTER);
