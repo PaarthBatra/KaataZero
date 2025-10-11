@@ -31,6 +31,15 @@ import javax.swing.JPanel;
 public class Board extends JPanel
         implements Runnable,MouseListener {
 
+    // Game constants
+    private static final int BOARD_SIZE = 3;
+    private static final int EMPTY_CELL = 9;
+    private static final int PLAYER_O = 0;
+    private static final int PLAYER_X = 1;
+    private static final int GAME_CONTINUE = 9;
+    private static final int GAME_DRAW = 999;
+    
+    // UI constants
     private final int B_WIDTH = 350;
     private final int B_HEIGHT = 350;
     private final int INITIAL_X = -40;
@@ -115,7 +124,7 @@ public class Board extends JPanel
             System.out.println("Random Value is : " + x);
             System.out.println("CenterOfBoxes[x][0] ,CenterOfBoxes[x][1] is  : " + CenterOfBoxes[x][0] + " , " + CenterOfBoxes[x][1]);
             DrawRandomZero(g,CenterOfBoxes[x][0] ,CenterOfBoxes[x][1]);
-            M.MSetPosition(M.Matrix,x,0);
+            M.MSetPosition(M.Matrix,x,PLAYER_O);
             M.PrintMatrix(M.Matrix);
             gui.Move="Player";
             gui.moveLabel.setText("Move : " + gui.Move);
@@ -159,19 +168,19 @@ public class Board extends JPanel
         System.out.println("CurrentValueAtMatrix is " + CurrentValueAtMatrix);
         M.PrintMatrix(M.Matrix);
             
-            if (CurrentValueAtMatrix == 9 && gui.Move == "Player"){
+            if (CurrentValueAtMatrix == EMPTY_CELL && gui.Move == "Player"){
                 int mx=CenterOfBoxes[position][0];
                 int my=CenterOfBoxes[position][1];
                 graphicsForDrawing2D.drawLine(mx - 20 , my + 20  , mx + 20 , my - 20);
                 graphicsForDrawing2D.drawLine(mx - 20 , my - 20  , mx + 20 , my + 20 );
                 System.out.println("Setting Value at position " + position + " as : 1");
-                M.MSetPosition(M.Matrix,position,1);
+                M.MSetPosition(M.Matrix,position,PLAYER_X);
 
                 System.out.println("Printing Matrix after Players Move");
                 M.PrintMatrix(M.Matrix);
                 
             int Success = M.MSuccess(M.Matrix);
-            if (Success == 0){
+            if (Success == PLAYER_O){
                 gui.statusbar.setText("Computer Won");
                 //.GameRunning=false;
                 gui.Score = 0 ;
@@ -194,7 +203,7 @@ public class Board extends JPanel
                     }
                 
                 }
-            else if (Success == 1){
+            else if (Success == PLAYER_X){
                 gui.statusbar.setText("Player Won");
                 //gui.GameRunning=false;
                 gui.Score = gui.Score + 100 ;
@@ -218,7 +227,7 @@ public class Board extends JPanel
                 
                     }      
                 }
-            else if (Success == 999){
+            else if (Success == GAME_DRAW){
                 gui.statusbar.setText("Match Drawn");
                 gui.Score = gui.Score - 100 ;
                 gui.scoreLabel.setText("Score : " + gui.Score);
@@ -290,15 +299,15 @@ public class Board extends JPanel
         
         System.out.println("CurrentValueAtMatrix is " + CurrentValueAtMatrix);
         M.PrintMatrix(M.Matrix);
-        if (CurrentValueAtMatrix == 9 && gui.Move == "Computer"){
+        if (CurrentValueAtMatrix == EMPTY_CELL && gui.Move == "Computer"){
             DrawRandomZero(g,CenterOfBoxes[x][0] ,CenterOfBoxes[x][1]);
             System.out.println("Setting Value at position " + x + " as : 0");
-            M.MSetPosition(M.Matrix,x,0);
+            M.MSetPosition(M.Matrix,x,PLAYER_O);
             System.out.println("Printing Matrix after Computers Move");
             M.PrintMatrix(M.Matrix);
             
             Success = M.MSuccess(M.Matrix);
-            if (Success == 0){
+            if (Success == PLAYER_O){
                 gui.statusbar.setText("Computer Won");
                 //.GameRunning=false;
                 gui.Score = 0 ;
@@ -319,7 +328,7 @@ public class Board extends JPanel
                     }
                 
                 }
-            else if (Success == 1){
+            else if (Success == PLAYER_X){
                 gui.statusbar.setText("Player Won");
                 //gui.GameRunning=false;
                 gui.Score = gui.Score + 100 ;
@@ -340,7 +349,7 @@ public class Board extends JPanel
                 
                     }      
                 }
-            else if (Success == 999){
+            else if (Success == GAME_DRAW){
                 gui.statusbar.setText("Match Drawn");
                 gui.Score = gui.Score - 100 ;
                 gui.scoreLabel.setText("Score : " + gui.Score);
