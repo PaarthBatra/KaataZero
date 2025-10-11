@@ -17,6 +17,8 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 - **Animated Board**: Smooth drawing animations for game board
 - **Menu System**: File and Help menus with game controls
 - **Status Tracking**: Real-time display of current move and score
+- **Java 7 Compatible**: Code updated to work with JDK 1.7 (no lambdas; inner classes used)
+- **Code Clean-up**: Magic numbers replaced with constants for readability and maintainability
 
 ## How to Play
 
@@ -30,19 +32,19 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 ## Technical Details
 
 ### Architecture
-- **callGUI.java**: Main application frame and UI components
-- **Board.java**: Game board logic, mouse handling, and graphics rendering
-- **KaataZero.java**: Core game logic, matrix operations, and win detection
+- `callGUI.java`: Main application frame and UI components
+- `Board.java`: Game board logic, mouse handling, and graphics rendering
+- `KaataZero.java`: Core game logic, matrix operations, and win detection
 
 ### Requirements
-- Java Runtime Environment (JRE)
+- Java Runtime Environment (JRE) 1.7+
 - Java Swing support
 
 ### Build Information
-- Built with NetBeans IDE
+- Built with NetBeans/Ant or javac/jar
 - Java Swing for GUI components
 - Custom graphics and animations
-- Executable JAR and Windows executable included
+- Executable JAR and Windows installer included
 
 ## Installation & Running
 
@@ -51,8 +53,9 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 java -jar KaataZero.jar
 ```
 
-### Option 2: Windows Executable
-Double-click `KaataZero.exe` to run directly on Windows.
+### Option 2: Windows Installer
+- Use the generated installer under `GeneratedEXE/KaataZero.exe`
+- Installer built with NSIS and points to `dist/KaataZero.jar`
 
 ## Author
 
@@ -61,6 +64,12 @@ Double-click `KaataZero.exe` to run directly on Windows.
 - Website: www.versionpb.co.in
 - Version: 1.0.0.0
 - Release Date: December 7, 2015
+
+## Changelog Highlights
+- Java 7 compatibility (removed lambdas; fixed inner class variable scope)
+- Constants introduced for board size, symbols, and status codes
+- Installer updated to use new domain and correct resource paths
+- Reverted difficulty-level changes to keep stable classic gameplay
 
 ## License
 

@@ -5,6 +5,25 @@ All notable changes to the KaataZero project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1] - 2025-10-12
+
+### Changed
+- Updated documentation to reflect Java 7 compatibility
+- Replaced magic numbers with constants in `KaataZero.java` and `Board.java`
+- Updated NSIS installer to use `www.versionpb.co.in` and correct icon/header assets
+- Installer now packages `dist/KaataZero.jar` and `README.TXT`
+
+### Reverted
+- Removed difficulty level UI and AI strategy code to restore stable classic gameplay
+  - Reverted changes in `callGUI.java` (difficulty combo removed)
+  - Reverted AI changes in `Board.java` to use random computer moves
+  - Removed AI helper methods from `KaataZero.java`
+
+### Compatibility
+- Ensured Java 7 (JDK 1.7.0_80) compatibility
+  - Converted lambda to anonymous inner class in `callGUI.java`
+  - Marked inner-class captured variables `final`
+
 ## [1.0.0.0] - 2015-12-07
 
 ### Added
