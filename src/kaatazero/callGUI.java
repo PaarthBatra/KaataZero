@@ -112,19 +112,16 @@ public class callGUI extends JFrame {
         eMenuItemAboutUs.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent event) {
-                //String ImagePath="D:\\Paarth\\Google_Drive\\Google Drive\\Codes\\Java\\KaataZero\\images\\pbcabtdll";
                 String ImagePath="pbcabtdll";
                 ImageIcon icon = new ImageIcon(this.getClass().getResource(ImagePath));
                 Image img = icon.getImage() ;  
-                Image newimg = img.getScaledInstance( 100, 100,  java.awt.Image.SCALE_SMOOTH ) ;  
-                //icon = new ImageIcon( newimg );
+                Image newimg = img.getScaledInstance( 100, 100,  java.awt.Image.SCALE_SMOOTH ) ;
                 
                 
                 JLabel lbl = new JLabel(new ImageIcon((newimg)));
                 JLabel a = new JLabel("<html>Kaata Zero: <br>"
                         + "Kaata Zero is te best way to pass time <br><br> Author : Paarth Batra<br>Version : 1.0.0.0<br>Release Date : 7th Dec 2015<br><br>Contact:"
                         + "paarth_batra@yahoo.co.in<br>paarthh2@rediffmail.com<hr><hr>www.versionpb.co.in<br>Its all about what do you want ! <br> Sno: 201512070000007</html>");
-                //GridLayout experimentLayout = new GridLayout(4,4,5,2);
                 JPanel p = new JPanel();
                   JLabel b = new JLabel("<html>www.versionpb.co.in<br>Its all about what do you want !<br> Sno: 201512070000007</html>");
                 //p.setLayout(experimentLayout);
@@ -142,25 +139,15 @@ public class callGUI extends JFrame {
         setJMenuBar(menubar);
 
         
-       JPanel panel = new JPanel();
-       //panel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-       //panel.setLayout(new GridLayout(3, 2, 5, 5));
-        
+       final JPanel panel = new JPanel();
+
        JButton playButton = new JButton("Play");
-       //JButton startButton = new JButton("Start");
        panel.setLayout(null);
-       //playButton.setLayout(null);
        
         String vpbicon ="Splash.png";
         ImageIcon icon = new ImageIcon(this.getClass().getResource(vpbicon));
-        Image img = icon.getImage() ;  
-        //Image newimg = img.getScaledInstance( 100, 100,  java.awt.Image.SCALE_SMOOTH ) ;  
-                //icon = new ImageIcon( newimg );
-                
-                
-        //JLabel thumb = new JLabel(new ImageIcon((img)));
-        
-        
+        Image img = icon.getImage() ;
+
        JLabel thumb = new JLabel();
        thumb.setIcon(icon);
        panel.add(playButton);
@@ -182,7 +169,7 @@ public class callGUI extends JFrame {
        statusbar.setPreferredSize(new Dimension(-1, 22));
        statusbar.setBorder(LineBorder.createGrayLineBorder());
        add(statusbar, BorderLayout.NORTH);
-       Board board = new Board(this);
+       final Board board = new Board(this);
        
        
        Dimension Seprator = new Dimension();
@@ -190,8 +177,7 @@ public class callGUI extends JFrame {
        add(horizontal, BorderLayout.SOUTH);
 
        System.out.println("Dimension using getSize is " + final_width);
-       //horizontal.add(startButton);
-       //horizontal.addSeparator(Seprator);
+
 
        horizontal.add(moveLabel);
        horizontal.addSeparator(Seprator);
@@ -201,46 +187,30 @@ public class callGUI extends JFrame {
        horizontal.addSeparator(Seprator);
        
        horizontal.add(scoreLabel);
-       
-       
-       
        add(panel,BorderLayout.CENTER);
-       //add(board,BorderLayout.CENTER);
-       //add(panel); 
+
        
-       playButton.addActionListener((ActionEvent e) -> {
-           // display/center the jdialog when the button is pressed
-           System.out.println("Play Button Clicked");
-           statusbar.setText("Game is Running");
-           if ( GameRunning == false ){
-           panel.setVisible(false);
-           add(board,BorderLayout.CENTER);
-           board.animator.start();
-           GameRunning=true;
-           }
-           else{
-           repaint();
-           board.M.MReinitialize();
-           
+       playButton.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               // display/center the jdialog when the button is pressed
+               System.out.println("Play Button Clicked");
+               statusbar.setText("Game is Running");
+               if ( GameRunning == false ){
+                   panel.setVisible(false);
+                   add(board,BorderLayout.CENTER);
+                   board.animator.start();
+                   GameRunning=true;
+               }
+               else{
+                   repaint();
+                   board.M.MReinitialize();
+               
+               }
            }
        });
        
-       /*
-       startButton.addActionListener((ActionEvent e) -> {
-           // display/center the jdialog when the button is pressed
-           System.out.println("Start Button Clicked");
-           statusbar.setText("Game is Running");
-           if ( GameRunning == false ){
-           board.animator.start();
-           GameRunning=true;
-           }
-           else{
-           repaint();
-           board.M.MReinitialize();
-           
-           }
-       });
-               */
+
        
         
         setResizable(false);
