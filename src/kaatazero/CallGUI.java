@@ -33,6 +33,7 @@ public class CallGUI extends JFrame {
 
     protected boolean gameRunning;
     public String move = "Computer";
+    public String gameMode = "Computer";
     public String difficulty = "Easy";
     protected JLabel moveLabel = new JLabel();
     protected JLabel statusbar = new JLabel("Click Start Button to Start Game");
@@ -118,10 +119,22 @@ public class CallGUI extends JFrame {
 
        moveLabel.setText("Move : Computer");
        scoreLabel.setText("Score : " + score);
+       final JComboBox<String> modeCombo = new JComboBox<String>(new String[] {"Computer", "2 Player"});
+       modeCombo.setSelectedItem(gameMode);
+       modeCombo.setPreferredSize(new Dimension(76, 24));
+       modeCombo.setMaximumSize(new Dimension(76, 24));
        final JComboBox<String> difficultyCombo = new JComboBox<String>(new String[] {"Easy", "Medium", "Hard"});
        difficultyCombo.setSelectedItem(difficulty);
-       difficultyCombo.setPreferredSize(new Dimension(70, 24));
-       difficultyCombo.setMaximumSize(new Dimension(70, 24));
+       difficultyCombo.setPreferredSize(new Dimension(64, 24));
+       difficultyCombo.setMaximumSize(new Dimension(64, 24));
+       modeCombo.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               gameMode = (String) modeCombo.getSelectedItem();
+               difficultyCombo.setEnabled("Computer".equals(gameMode));
+               statusbar.setText("Mode set to " + gameMode);
+           }
+       });
        difficultyCombo.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
@@ -146,11 +159,14 @@ public class CallGUI extends JFrame {
        separator.setSize(4,0);
        add(horizontal, BorderLayout.SOUTH);
 
-       moveLabel.setPreferredSize(new Dimension(105, 24));
-       scoreLabel.setPreferredSize(new Dimension(58, 24));
+       moveLabel.setPreferredSize(new Dimension(72, 24));
+       scoreLabel.setPreferredSize(new Dimension(52, 24));
        horizontal.add(moveLabel);
        horizontal.addSeparator(separator);
-       horizontal.add(new JLabel("Diff: "));
+       horizontal.add(new JLabel("M:"));
+       horizontal.add(modeCombo);
+       horizontal.addSeparator(separator);
+       horizontal.add(new JLabel("D:"));
        horizontal.add(difficultyCombo);
        horizontal.addSeparator(separator);
        horizontal.add(scoreLabel);

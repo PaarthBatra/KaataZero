@@ -56,6 +56,8 @@ public class Board extends JPanel
     public KaataZero game ;
     public CallGUI gui;
     private boolean gameActive;
+    private boolean boardReady;
+    private int currentPlayer;
     private final ComputerPlayer computerPlayer = new ComputerPlayer();
     
     public Board(CallGUI gui1) {
@@ -78,6 +80,7 @@ public class Board extends JPanel
         yReverse = B_HEIGHT;
         xReverse = B_WIDTH;
         gameActive = false;
+        boardReady = false;
         
     }
 
@@ -121,24 +124,30 @@ public class Board extends JPanel
     }
 
     public void PlayersMove(int position){
-        if (!gameActive || !"Player".equals(gui.move) || !KaataZero.isEmptyPosition(game.matrix, position)) {
+        if (!gameActive || !isHumanTurn() || !KaataZero.isEmptyPosition(game.matrix, position)) {
             return;
         }
 
-        KaataZero.setPosition(game.matrix,position,PLAYER_X);
+        KaataZero.setPosition(game.matrix,position,currentPlayer);
         repaint();
 
         if (handleGameStatus()) {
             return;
         }
 
-        gui.move="Computer";
-        gui.moveLabel.setText("Move : " + gui.move);
-        ComputersMove();
+        if (isPlayerVsPlayerMode()) {
+            currentPlayer = currentPlayer == PLAYER_X ? PLAYER_O : PLAYER_X;
+            updateTurnLabel();
+        } else {
+            currentPlayer = PLAYER_O;
+            gui.move="Computer";
+            gui.moveLabel.setText("Move : " + gui.move);
+            ComputersMove();
+        }
     }
 
     public void ComputersMove(){
-        if (!gameActive || !"Computer".equals(gui.move)) {
+        if (!gameActive || isPlayerVsPlayerMode() || !"Computer".equals(gui.move)) {
             return;
         }
 
@@ -153,6 +162,7 @@ public class Board extends JPanel
         repaint();
 
         if (!handleGameStatus()) {
+            currentPlayer = PLAYER_X;
             gui.move="Player";
             gui.moveLabel.setText("Move : " + gui.move);
         }
@@ -167,7 +177,19 @@ public class Board extends JPanel
 
         gameActive = false;
 
-        if (success == PLAYER_O){
+        if (isPlayerVsPlayerMode()) {
+            if (success == PLAYER_X) {
+                gui.statusbar.setText("Player X Won");
+                showPlayAgainDialog("Player X Won!\nReady to Play Again?");
+            } else if (success == PLAYER_O) {
+                gui.statusbar.setText("Player O Won");
+                showPlayAgainDialog("Player O Won!\nReady to Play Again?");
+            } else if (success == GAME_DRAW) {
+                gui.statusbar.setText("Match Drawn");
+                showPlayAgainDialog("Match Drawn!\nReady to Play Again?");
+            }
+        }
+        else if (success == PLAYER_O){
             gui.statusbar.setText("Computer Won");
             gui.score = 0 ;
             gui.scoreLabel.setText("Score : " + gui.score);
@@ -238,7 +260,8 @@ public class Board extends JPanel
 
     public void startGame() {
         game.reset();
-        gui.move = "Computer";
+        currentPlayer = PLAYER_X;
+        gui.move = isPlayerVsPlayerMode() ? "Player X" : "Computer";
         gui.moveLabel.setText("Move : " + gui.move);
         gui.statusbar.setText("Game is Running");
         x = INITIAL_X;
@@ -246,6 +269,7 @@ public class Board extends JPanel
         yReverse = B_HEIGHT;
         xReverse = B_WIDTH;
         gameActive = true;
+        boardReady = false;
         repaint();
 
         animator = new Thread(this);
@@ -284,16 +308,34 @@ public class Board extends JPanel
         y = B_HEIGHT;
         xReverse = 0;
         yReverse = 0;
+        boardReady = true;
         repaint();
 
         if (gameActive) {
             SwingUtilities.invokeLater(new Runnable() {
                 @Override
                 public void run() {
-                    ComputersMove();
+                    if (isPlayerVsPlayerMode()) {
+                        updateTurnLabel();
+                    } else {
+                        ComputersMove();
+                    }
                 }
             });
         }
+    }
+
+    private boolean isPlayerVsPlayerMode() {
+        return "2 Player".equals(gui.gameMode);
+    }
+
+    private boolean isHumanTurn() {
+        return boardReady && (isPlayerVsPlayerMode() || "Player".equals(gui.move));
+    }
+
+    private void updateTurnLabel() {
+        gui.move = currentPlayer == PLAYER_X ? "Player X" : "Player O";
+        gui.moveLabel.setText("Move : " + gui.move);
     }
     
     
