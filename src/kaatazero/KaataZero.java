@@ -71,17 +71,27 @@ public class KaataZero {
     }
 
     public static int checkStatus(int[][] matrix) {
+       int[] winningLine = findWinningLine(matrix);
+
+       if (winningLine != null) {
+           return getPosition(matrix, winningLine[0]);
+       }
+
+       return isBoardFull(matrix) ? GAME_DRAW : GAME_CONTINUE;
+    }
+
+    public static int[] findWinningLine(int[][] matrix) {
        for (int i = 0; i < WINNING_LINES.length; i++) {
            int first = getPosition(matrix, WINNING_LINES[i][0]);
            int second = getPosition(matrix, WINNING_LINES[i][1]);
            int third = getPosition(matrix, WINNING_LINES[i][2]);
 
            if (first != EMPTY_CELL && first == second && second == third) {
-               return first;
+               return new int[] {WINNING_LINES[i][0], WINNING_LINES[i][1], WINNING_LINES[i][2]};
            }
        }
 
-       return isBoardFull(matrix) ? GAME_DRAW : GAME_CONTINUE;
+       return null;
     }
     
     public static int[][] setPosition(int[][] matrix,int position,int value)

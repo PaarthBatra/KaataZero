@@ -9,14 +9,22 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 ## Features
 
 - **Player vs Computer**: Human player competes against AI opponent
+- **2 Player Mode**: Two local players can take turns on the same board
+- **Difficulty Modes**: Easy uses random moves, Medium mixes tactical and random moves, and Hard uses minimax
+- **Start Control**: Choose whether the player or computer starts the next computer match
 - **Scoring System**: 
-  - Win: +100 points
+  - Easy win: +50 points
+  - Medium win: +100 points
+  - Hard win: +200 points
   - Loss: Score resets to 0
-  - Draw: -100 points
+  - Draw: -50 points
 - **Visual Interface**: Clean Java Swing GUI with custom graphics
+- **Winning Highlight**: The winning row, column, or diagonal is highlighted
+- **Restart Button**: Restart the current setup without closing the game
 - **Animated Board**: Smooth drawing animations for game board
 - **Menu System**: File and Help menus with game controls
-- **Status Tracking**: Real-time display of current move and score
+- **Status Tracking**: Real-time display of current move, mode, difficulty, starter, and score
+- **Saved Settings**: Last selected mode, difficulty, and starter are restored on launch
 - **Java 7 Compatible**: Code updated to work with JDK 1.7 (no lambdas; inner classes used)
 - **Code Clean-up**: Magic numbers replaced with constants for readability and maintainability
 
@@ -24,10 +32,11 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 
 1. Launch the game using `KaataZero.jar` or `KaataZero.exe`
 2. Click "Play" to start a new game
-3. The computer makes the first move (places a "0")
-4. Click on any empty square to place your "X"
-5. First to get three in a row (horizontally, vertically, or diagonally) wins
-6. Play again or exit when the game ends
+3. Select Computer or 2 Player mode from the controls
+4. Pick a difficulty and starter for computer games
+5. Click on any empty square to place your mark
+6. First to get three in a row (horizontally, vertically, or diagonally) wins
+7. Use Restart or play again when the game ends
 
 ## Technical Details
 
@@ -70,7 +79,7 @@ java -jar KaataZero.jar
 - Java 7 compatibility (removed lambdas; fixed inner class variable scope)
 - Constants introduced for board size, symbols, and status codes
 - Installer updated to use new domain and correct resource paths
-- Reverted difficulty-level changes to keep stable classic gameplay
+- Added difficulty modes, local 2 Player mode, restart control, saved settings, and winning-line highlighting
 
 ## License
 

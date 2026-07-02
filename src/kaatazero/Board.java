@@ -45,6 +45,7 @@ public class Board extends JPanel
     private final int DELAY = 2;
     private final int STROKESIZE =10;
     private final Color KAATAZEROCOLOUR = Color.WHITE;
+    private final Color WIN_LINE_COLOUR = Color.YELLOW;
     private final Color BACKGROUNDCOLOUR = Color.gray;
     private final int MARK_SIZE = 40;
     private final int[][] CenterOfBoxes={{B_WIDTH/6,B_HEIGHT/6},{B_WIDTH/2,B_HEIGHT/6},{B_WIDTH*5/6,B_HEIGHT/6},
@@ -58,6 +59,7 @@ public class Board extends JPanel
     private boolean gameActive;
     private boolean boardReady;
     private int currentPlayer;
+    private int[] winningLine;
     private final ComputerPlayer computerPlayer = new ComputerPlayer();
     
     public Board(CallGUI gui1) {
@@ -105,6 +107,7 @@ public class Board extends JPanel
         g.drawLine(B_WIDTH+10,B_HEIGHT*2/3,xReverse+10,B_HEIGHT*2/3);
 
         drawMoves(g);
+        drawWinningLine(g);
         
         Toolkit.getDefaultToolkit().sync();
     }
@@ -123,12 +126,28 @@ public class Board extends JPanel
         }
     }
 
+    private void drawWinningLine(Graphics g) {
+        if (winningLine == null) {
+            return;
+        }
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.setColor(WIN_LINE_COLOUR);
+        g2d.setStroke(new BasicStroke(STROKESIZE + 2));
+
+        int startPosition = winningLine[0];
+        int endPosition = winningLine[2];
+        g2d.drawLine(CenterOfBoxes[startPosition][0], CenterOfBoxes[startPosition][1],
+                CenterOfBoxes[endPosition][0], CenterOfBoxes[endPosition][1]);
+    }
+
     public void PlayersMove(int position){
         if (!gameActive || !isHumanTurn() || !KaataZero.isEmptyPosition(game.matrix, position)) {
             return;
         }
 
         KaataZero.setPosition(game.matrix,position,currentPlayer);
+        gui.playMoveSound();
         repaint();
 
         if (handleGameStatus()) {
@@ -159,6 +178,7 @@ public class Board extends JPanel
         }
 
         KaataZero.setPosition(game.matrix,position,PLAYER_O);
+        gui.playMoveSound();
         repaint();
 
         if (!handleGameStatus()) {
@@ -176,6 +196,9 @@ public class Board extends JPanel
         }
 
         gameActive = false;
+        winningLine = KaataZero.findWinningLine(game.matrix);
+        repaint();
+        gui.playGameOverSound();
 
         if (isPlayerVsPlayerMode()) {
             if (success == PLAYER_X) {
@@ -192,21 +215,21 @@ public class Board extends JPanel
         else if (success == PLAYER_O){
             gui.statusbar.setText("Computer Won");
             gui.score = 0 ;
-            gui.scoreLabel.setText("Score : " + gui.score);
+            gui.updateScoreLabel();
             showPlayAgainDialog("Oops ! Computer Won \n Your Score becomes : " + gui.score + " \n Try hard buddy."
                     + "\nReady to Play Again?");
         }
         else if (success == PLAYER_X){
             gui.statusbar.setText("Player Won");
-            gui.score = gui.score + 100 ;
-            gui.scoreLabel.setText("Score : " + gui.score);
+            gui.score = gui.score + gui.getWinScore() ;
+            gui.updateScoreLabel();
             showPlayAgainDialog("Congratulations ! You Won \n Your Score is : " + gui.score + " \n You are doing great !!."
                     + "\nReady to Play Again ?");
         }
         else if (success == GAME_DRAW){
             gui.statusbar.setText("Match Drawn");
-            gui.score = gui.score - 100 ;
-            gui.scoreLabel.setText("Score : " + gui.score);
+            gui.score = gui.score - 50 ;
+            gui.updateScoreLabel();
             showPlayAgainDialog("Well ! Match Drawn \n Your Score becomes : " + gui.score + " \nDraw is same as Losing , Isnt it ?"
                     + "\nWant to Win ? Play Again ?");
         }
@@ -260,8 +283,9 @@ public class Board extends JPanel
 
     public void startGame() {
         game.reset();
-        currentPlayer = PLAYER_X;
-        gui.move = isPlayerVsPlayerMode() ? "Player X" : "Computer";
+        winningLine = null;
+        currentPlayer = shouldComputerStart() ? PLAYER_O : PLAYER_X;
+        gui.move = startingMoveText();
         gui.moveLabel.setText("Move : " + gui.move);
         gui.statusbar.setText("Game is Running");
         x = INITIAL_X;
@@ -327,6 +351,18 @@ public class Board extends JPanel
 
     private boolean isPlayerVsPlayerMode() {
         return "2 Player".equals(gui.gameMode);
+    }
+
+    private boolean shouldComputerStart() {
+        return !isPlayerVsPlayerMode() && "Computer".equals(gui.startingPlayer);
+    }
+
+    private String startingMoveText() {
+        if (isPlayerVsPlayerMode()) {
+            return "Player X";
+        }
+
+        return shouldComputerStart() ? "Computer" : "Player";
     }
 
     private boolean isHumanTurn() {
