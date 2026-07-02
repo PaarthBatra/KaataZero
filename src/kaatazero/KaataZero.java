@@ -12,30 +12,38 @@ package kaatazero;
 public class KaataZero {
     
     // Game constants
-    private static final int BOARD_SIZE = 3;
-    private static final int EMPTY_CELL = 9;
-    private static final int PLAYER_O = 0;
-    private static final int PLAYER_X = 1;
-    private static final int GAME_CONTINUE = 9;
-    private static final int GAME_DRAW = 999;
+    public static final int BOARD_SIZE = 3;
+    public static final int EMPTY_CELL = 9;
+    public static final int PLAYER_O = 0;
+    public static final int PLAYER_X = 1;
+    public static final int GAME_CONTINUE = 9;
+    public static final int GAME_DRAW = 999;
+
+    private static final int[][] WINNING_LINES = {
+        {0, 1, 2},
+        {3, 4, 5},
+        {6, 7, 8},
+        {0, 3, 6},
+        {1, 4, 7},
+        {2, 5, 8},
+        {0, 4, 8},
+        {2, 4, 6}
+    };
 
     /**
      * @param args the command line arguments
      */
     public int[][] Matrix = new int[BOARD_SIZE][BOARD_SIZE];
     public KaataZero(callGUI gui){
-        //int[][] Matrix = new int[3][3];
-        int[][] Result;
-        //initializing matrix
-        for (int row = 0; row < BOARD_SIZE; row ++)
-            for (int col = 0; col < BOARD_SIZE; col++)
-                Matrix[row][col] = EMPTY_CELL;
+        MReinitialize();
         System.out.println("KaataZero Class Initiated");
     }
     public void MReinitialize(){
-        for (int row = 0; row < BOARD_SIZE; row ++)
-            for (int col = 0; col < BOARD_SIZE; col++)
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
                 Matrix[row][col] = EMPTY_CELL;
+            }
+        }
         System.out.println("KaataZero Class : Method MReinitialize");
     }
     
@@ -87,26 +95,15 @@ public class KaataZero {
         }
     }
     public static int MFindValue(int[][] Matrix,int r,int c){
-        int returnValue;
-        int value;
-        
         System.out.println("Class: KaataZero , MFindValue : Started");
-        value = Matrix[r][c];
-        if (value == EMPTY_CELL)
-            returnValue=value;
-        else
-            returnValue=value;
-        
-        return returnValue;
+        return Matrix[r][c];
     }
     
     public static int[][] MSet(int[][] Matrix,int r,int c,int value)
     {
-        int[][] FinalM = new int[3][3];
         System.out.println("Class: KaataZero , Method : MSet :Hi I am MSet method");
-        FinalM = Matrix;
         Matrix[r][c] = value;
-        return FinalM;
+        return Matrix;
     }
     public static int MSuccess(int[][] Matrix){
         //0 computer won
@@ -114,96 +111,73 @@ public class KaataZero {
         //999 match drawn
         // 9 all ok
        System.out.println("Class: KaataZero , Method : MSuccess");
-       int returnValue;
-       if( Matrix[0][0] == PLAYER_O && Matrix[0][1] == PLAYER_O && Matrix[0][2] == PLAYER_O
-               ||
-            Matrix[1][0] == PLAYER_O && Matrix[1][1] == PLAYER_O && Matrix[1][2] == PLAYER_O   
-              ||
-            Matrix[2][0] == PLAYER_O && Matrix[2][1] == PLAYER_O && Matrix[2][2] == PLAYER_O  
-              ||
-            Matrix[0][0] == PLAYER_O && Matrix[1][0] == PLAYER_O && Matrix[2][0] == PLAYER_O  
-               ||
-            Matrix[0][1] == PLAYER_O && Matrix[1][1] == PLAYER_O && Matrix[2][1] == PLAYER_O  
-              ||
-            Matrix[0][2] == PLAYER_O && Matrix[1][2] == PLAYER_O && Matrix[2][2] == PLAYER_O  
-               ||
-            Matrix[0][0] == PLAYER_O && Matrix[1][1] == PLAYER_O && Matrix[2][2] == PLAYER_O  
-              ||
-            Matrix[0][2] == PLAYER_O && Matrix[1][1] == PLAYER_O && Matrix[2][0] == PLAYER_O    
-              
-              
-          )
-       {
-       returnValue = PLAYER_O;    
+       for (int i = 0; i < WINNING_LINES.length; i++) {
+           int first = getPosition(Matrix, WINNING_LINES[i][0]);
+           int second = getPosition(Matrix, WINNING_LINES[i][1]);
+           int third = getPosition(Matrix, WINNING_LINES[i][2]);
+
+           if (first != EMPTY_CELL && first == second && second == third) {
+               return first;
+           }
        }
-       else if( Matrix[0][0] == PLAYER_X && Matrix[0][1] == PLAYER_X && Matrix[0][2] == PLAYER_X
-               ||
-            Matrix[1][0] == PLAYER_X && Matrix[1][1] == PLAYER_X && Matrix[1][2] == PLAYER_X   
-              ||
-            Matrix[2][0] == PLAYER_X && Matrix[2][1] == PLAYER_X && Matrix[2][2] == PLAYER_X  
-              ||
-            Matrix[0][0] == PLAYER_X && Matrix[1][0] == PLAYER_X && Matrix[2][0] == PLAYER_X  
-               ||
-            Matrix[0][1] == PLAYER_X && Matrix[1][1] == PLAYER_X && Matrix[2][1] == PLAYER_X  
-              ||
-            Matrix[0][2] == PLAYER_X && Matrix[1][2] == PLAYER_X && Matrix[2][2] == PLAYER_X  
-               ||
-            Matrix[0][0] == PLAYER_X && Matrix[1][1] == PLAYER_X && Matrix[2][2] == PLAYER_X  
-              ||
-            Matrix[0][2] == PLAYER_X && Matrix[1][1] == PLAYER_X && Matrix[2][0] == PLAYER_X  
-          )
-       {
-       returnValue = PLAYER_X;    
-       }
-       else if (Matrix[0][0] != EMPTY_CELL && Matrix[1][0] != EMPTY_CELL && Matrix[2][0] != EMPTY_CELL
-                && Matrix[0][1] != EMPTY_CELL && Matrix[1][1] != EMPTY_CELL && Matrix[2][1] != EMPTY_CELL
-                && Matrix[0][2] != EMPTY_CELL && Matrix[1][2] != EMPTY_CELL && Matrix[2][2] != EMPTY_CELL)
-       {
-           
-           returnValue=GAME_DRAW;
-           
-       }
-       else returnValue = GAME_CONTINUE;
-       return returnValue;
+
+       return isBoardFull(Matrix) ? GAME_DRAW : GAME_CONTINUE;
     }
     
     public static int[][] MSetPosition(int[][] Matrix,int position,int value)
     {
-        int[][] FinalM = new int[3][3];
         System.out.println("Class: KaataZero , Method : MSetPosition :Hi I am MSetPosition method");
-        FinalM = Matrix;
-        //position = 5;
-        switch (position){
-        case 0 : 
-            Matrix[0][0] = value;
-            break;
-        case 1: 
-            Matrix[1][0] = value;
-            break;
-        case 2: 
-            Matrix[2][0] = value;
-            break;
-        case 3: 
-            Matrix[0][1] = value;
-            break;
-        case 4: 
-            Matrix[1][1] = value;
-            break;
-        case 5: 
-            Matrix[2][1] = value;
-            break;
-        case 6: 
-            Matrix[0][2] = value;
-            break;
-        case 7: 
-            Matrix[1][2] = value;
-            break;
-        case 8: 
-            Matrix[2][2] = value;
-            break;
+        int row = rowFromPosition(position);
+        int col = colFromPosition(position);
+
+        if (row >= 0 && col >= 0) {
+            Matrix[row][col] = value;
         }
         
-        return FinalM;
+        return Matrix;
+    }
+
+    public static int getPosition(int[][] Matrix, int position) {
+        int row = rowFromPosition(position);
+        int col = colFromPosition(position);
+
+        if (row < 0 || col < 0) {
+            return EMPTY_CELL;
+        }
+
+        return Matrix[row][col];
+    }
+
+    public static boolean isEmptyPosition(int[][] Matrix, int position) {
+        return getPosition(Matrix, position) == EMPTY_CELL;
+    }
+
+    public static boolean isBoardFull(int[][] Matrix) {
+        for (int row = 0; row < BOARD_SIZE; row++) {
+            for (int col = 0; col < BOARD_SIZE; col++) {
+                if (Matrix[row][col] == EMPTY_CELL) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public static int rowFromPosition(int position) {
+        if (position < 0 || position >= BOARD_SIZE * BOARD_SIZE) {
+            return -1;
+        }
+
+        return position % BOARD_SIZE;
+    }
+
+    public static int colFromPosition(int position) {
+        if (position < 0 || position >= BOARD_SIZE * BOARD_SIZE) {
+            return -1;
+        }
+
+        return position / BOARD_SIZE;
     }
     
 }

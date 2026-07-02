@@ -28,6 +28,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.IOException;
+import java.net.URL;
 import java.net.URI;
 import java.net.URISyntaxException;
 import javax.swing.ImageIcon;
@@ -90,9 +91,10 @@ public class callGUI extends JFrame {
 
         // use icon here
         //setIconImage(icon);
-       Image image = new ImageIcon(this.getClass().getResource("Icon.png")).getImage();
-       //setIconImage(Toolkit.getDefaultToolkit().getImage(imagePath));
-       setIconImage(image);
+       ImageIcon appIcon = loadImageIcon("Icon.png");
+       if (appIcon != null) {
+           setIconImage(appIcon.getImage());
+       }
        JMenu file = new JMenu("File");
        JMenu help = new JMenu("Help");
        file.setMnemonic(KeyEvent.VK_F);
@@ -113,20 +115,20 @@ public class callGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent event) {
                 String ImagePath="pbcabtdll";
-                ImageIcon icon = new ImageIcon(this.getClass().getResource(ImagePath));
-                Image img = icon.getImage() ;  
-                Image newimg = img.getScaledInstance( 100, 100,  java.awt.Image.SCALE_SMOOTH ) ;
-                
-                
-                JLabel lbl = new JLabel(new ImageIcon((newimg)));
+                ImageIcon icon = loadImageIcon(ImagePath);
                 JLabel a = new JLabel("<html>Kaata Zero: <br>"
                         + "Kaata Zero is te best way to pass time <br><br> Author : Paarth Batra<br>Version : 1.0.0.0<br>Release Date : 7th Dec 2015<br><br>Contact:"
                         + "paarth_batra@yahoo.co.in<br>paarthh2@rediffmail.com<hr><hr>www.versionpb.co.in<br>Its all about what do you want ! <br> Sno: 201512070000007</html>");
                 JPanel p = new JPanel();
-                  JLabel b = new JLabel("<html>www.versionpb.co.in<br>Its all about what do you want !<br> Sno: 201512070000007</html>");
                 //p.setLayout(experimentLayout);
                 p.add(a,BorderLayout.EAST);
-                p.add(lbl,BorderLayout.CENTER);
+
+                if (icon != null) {
+                    Image img = icon.getImage() ;  
+                    Image newimg = img.getScaledInstance( 100, 100,  java.awt.Image.SCALE_SMOOTH ) ;
+                    JLabel lbl = new JLabel(new ImageIcon((newimg)));
+                    p.add(lbl,BorderLayout.CENTER);
+                }
                 //p.add(b,BorderLayout.SOUTH);
                 JOptionPane.showMessageDialog(null, p, "AboutUs", 
                                  JOptionPane.PLAIN_MESSAGE, null);
@@ -145,11 +147,16 @@ public class callGUI extends JFrame {
        panel.setLayout(null);
        
         String vpbicon ="Splash.png";
-        ImageIcon icon = new ImageIcon(this.getClass().getResource(vpbicon));
-        Image img = icon.getImage() ;
+        ImageIcon icon = loadImageIcon(vpbicon);
 
        JLabel thumb = new JLabel();
-       thumb.setIcon(icon);
+       if (icon != null) {
+           thumb.setIcon(icon);
+       } else {
+           thumb.setForeground(Color.WHITE);
+           thumb.setHorizontalAlignment(JLabel.CENTER);
+           thumb.setText("Kaata Zero");
+       }
        panel.add(playButton);
        panel.add(thumb);
        playButton.setBounds(125, 190, 100, 40);
@@ -199,12 +206,11 @@ public class callGUI extends JFrame {
                if ( GameRunning == false ){
                    panel.setVisible(false);
                    add(board,BorderLayout.CENTER);
-                   board.animator.start();
+                   board.startGame();
                    GameRunning=true;
                }
                else{
-                   repaint();
-                   board.M.MReinitialize();
+                   board.startGame();
                
                }
            }
@@ -219,6 +225,17 @@ public class callGUI extends JFrame {
         setTitle("Kaata Zero");    
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);        
+    }
+
+    private ImageIcon loadImageIcon(String resourceName) {
+        URL resource = this.getClass().getResource(resourceName);
+
+        if (resource == null) {
+            System.out.println("Missing resource: " + resourceName);
+            return null;
+        }
+
+        return new ImageIcon(resource);
     }
 
   
