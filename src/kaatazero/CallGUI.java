@@ -19,9 +19,12 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.prefs.Preferences;
+import javax.swing.AbstractAction;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
@@ -30,6 +33,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.border.LineBorder;
 
 public class CallGUI extends JFrame {
@@ -38,15 +42,21 @@ public class CallGUI extends JFrame {
     private static final String PREF_GAME_MODE = "gameMode";
     private static final String PREF_DIFFICULTY = "difficulty";
     private static final String PREF_STARTING_PLAYER = "startingPlayer";
+    private static final String PREF_SOUND_ENABLED = "soundEnabled";
 
     protected boolean gameRunning;
     public String move = "Computer";
     public String gameMode = "Computer";
     public String difficulty = "Easy";
     public String startingPlayer = "Computer";
+    public boolean soundEnabled = true;
     protected JLabel moveLabel = new JLabel();
     protected JLabel statusbar = new JLabel("Click Start Button to Start Game");
+    protected JLabel historyLabel = new JLabel();
     protected int score = 0;
+    protected int playerWins = 0;
+    protected int opponentWins = 0;
+    protected int draws = 0;
     protected JLabel scoreLabel = new JLabel();
     protected int final_height = 350;
     protected int final_width = 350;
@@ -141,6 +151,9 @@ public class CallGUI extends JFrame {
        starterCombo.setSelectedItem(startingPlayer);
        starterCombo.setPreferredSize(new Dimension(76, 24));
        starterCombo.setMaximumSize(new Dimension(76, 24));
+       final JCheckBox soundCheck = new JCheckBox("Sound", soundEnabled);
+       soundCheck.setFocusable(false);
+       soundCheck.setMargin(new Insets(0, 0, 0, 0));
        modeCombo.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
@@ -169,6 +182,14 @@ public class CallGUI extends JFrame {
                saveSettings();
            }
        });
+       soundCheck.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               soundEnabled = soundCheck.isSelected();
+               statusbar.setText(soundEnabled ? "Sound enabled" : "Sound muted");
+               saveSettings();
+           }
+       });
        final JButton restartButton = new JButton("Restart");
        restartButton.setMargin(new Insets(2, 4, 2, 4));
        restartButton.setPreferredSize(new Dimension(72, 24));
@@ -176,10 +197,11 @@ public class CallGUI extends JFrame {
 
        JToolBar primaryToolbar = createControlToolbar();
        JToolBar secondaryToolbar = createControlToolbar();
-       JPanel bottomPanel = new JPanel(new GridLayout(2, 1));
-       bottomPanel.setPreferredSize(new Dimension(final_width, 58));
-       bottomPanel.setMinimumSize(new Dimension(final_width, 58));
-       bottomPanel.setMaximumSize(new Dimension(final_width, 58));
+       JToolBar historyToolbar = createControlToolbar();
+       JPanel bottomPanel = new JPanel(new GridLayout(3, 1));
+       bottomPanel.setPreferredSize(new Dimension(final_width, 87));
+       bottomPanel.setMinimumSize(new Dimension(final_width, 87));
+       bottomPanel.setMaximumSize(new Dimension(final_width, 87));
 
        statusbar.setPreferredSize(new Dimension(final_width, 22));
        statusbar.setBorder(LineBorder.createGrayLineBorder());
@@ -192,6 +214,8 @@ public class CallGUI extends JFrame {
 
        moveLabel.setPreferredSize(new Dimension(72, 24));
        scoreLabel.setPreferredSize(new Dimension(52, 24));
+       historyLabel.setPreferredSize(new Dimension(148, 24));
+       updateHistoryLabel();
        primaryToolbar.add(moveLabel);
        primaryToolbar.addSeparator(separator);
        primaryToolbar.add(new JLabel("Mode"));
@@ -205,11 +229,18 @@ public class CallGUI extends JFrame {
        secondaryToolbar.add(scoreLabel);
        secondaryToolbar.addSeparator(separator);
        secondaryToolbar.add(restartButton);
+       historyToolbar.add(historyLabel);
+       historyToolbar.addSeparator(separator);
+       historyToolbar.add(soundCheck);
+       historyToolbar.addSeparator(separator);
+       historyToolbar.add(new JLabel("Keys: R, Esc, 1-9"));
        bottomPanel.add(primaryToolbar);
        bottomPanel.add(secondaryToolbar);
+       bottomPanel.add(historyToolbar);
        difficultyCombo.setEnabled("Computer".equals(gameMode));
        starterCombo.setEnabled("Computer".equals(gameMode));
        add(panel,BorderLayout.CENTER);
+       installKeyboardShortcuts(board, restartButton);
 
        playButton.addActionListener(new ActionListener() {
            @Override
@@ -258,6 +289,7 @@ public class CallGUI extends JFrame {
         gameMode = PREFERENCES.get(PREF_GAME_MODE, gameMode);
         difficulty = PREFERENCES.get(PREF_DIFFICULTY, difficulty);
         startingPlayer = PREFERENCES.get(PREF_STARTING_PLAYER, startingPlayer);
+        soundEnabled = PREFERENCES.getBoolean(PREF_SOUND_ENABLED, soundEnabled);
         move = "Computer".equals(startingPlayer) ? "Computer" : "Player";
     }
 
@@ -265,6 +297,7 @@ public class CallGUI extends JFrame {
         PREFERENCES.put(PREF_GAME_MODE, gameMode);
         PREFERENCES.put(PREF_DIFFICULTY, difficulty);
         PREFERENCES.put(PREF_STARTING_PLAYER, startingPlayer);
+        PREFERENCES.putBoolean(PREF_SOUND_ENABLED, soundEnabled);
     }
 
     public int getWinScore() {
@@ -283,12 +316,78 @@ public class CallGUI extends JFrame {
         scoreLabel.setText("Score : " + score);
     }
 
+    public void updateHistoryLabel() {
+        historyLabel.setText("You:" + playerWins + " Opp:" + opponentWins + " Draw:" + draws);
+    }
+
+    public void recordPlayerWin() {
+        playerWins++;
+        updateHistoryLabel();
+    }
+
+    public void recordOpponentWin() {
+        opponentWins++;
+        updateHistoryLabel();
+    }
+
+    public void recordDraw() {
+        draws++;
+        updateHistoryLabel();
+    }
+
+    public void showGameResult(String resultText) {
+        statusbar.setText(resultText + " Press R to restart.");
+    }
+
     public void playMoveSound() {
+        if (!soundEnabled) {
+            return;
+        }
+
         Toolkit.getDefaultToolkit().beep();
     }
 
     public void playGameOverSound() {
+        if (!soundEnabled) {
+            return;
+        }
+
         Toolkit.getDefaultToolkit().beep();
+    }
+
+    private void installKeyboardShortcuts(final Board board, final JButton restartButton) {
+        JComponent rootPane = getRootPane();
+
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "restartGame");
+        rootPane.getActionMap().put("restartGame", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (restartButton.isEnabled()) {
+                    board.startGame();
+                    statusbar.setText("Game restarted");
+                }
+            }
+        });
+
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "exitGame");
+        rootPane.getActionMap().put("exitGame", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.exit(0);
+            }
+        });
+
+        for (int position = 0; position < KaataZero.BOARD_SIZE * KaataZero.BOARD_SIZE; position++) {
+            final int boardPosition = position;
+            int keyCode = KeyEvent.VK_1 + position;
+            rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(keyCode, 0), "playPosition" + position);
+            rootPane.getActionMap().put("playPosition" + position, new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    board.PlayersMove(boardPosition);
+                }
+            });
+        }
     }
 
     private void showAboutDialog() {

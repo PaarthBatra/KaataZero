@@ -22,7 +22,6 @@ import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
@@ -202,52 +201,36 @@ public class Board extends JPanel
 
         if (isPlayerVsPlayerMode()) {
             if (success == PLAYER_X) {
-                gui.statusbar.setText("Player X Won");
-                showPlayAgainDialog("Player X Won!\nReady to Play Again?");
+                gui.recordPlayerWin();
+                gui.showGameResult("Player X won.");
             } else if (success == PLAYER_O) {
-                gui.statusbar.setText("Player O Won");
-                showPlayAgainDialog("Player O Won!\nReady to Play Again?");
+                gui.recordOpponentWin();
+                gui.showGameResult("Player O won.");
             } else if (success == GAME_DRAW) {
-                gui.statusbar.setText("Match Drawn");
-                showPlayAgainDialog("Match Drawn!\nReady to Play Again?");
+                gui.recordDraw();
+                gui.showGameResult("Match drawn.");
             }
         }
         else if (success == PLAYER_O){
-            gui.statusbar.setText("Computer Won");
             gui.score = 0 ;
             gui.updateScoreLabel();
-            showPlayAgainDialog("Oops ! Computer Won \n Your Score becomes : " + gui.score + " \n Try hard buddy."
-                    + "\nReady to Play Again?");
+            gui.recordOpponentWin();
+            gui.showGameResult("Computer won. Your score is " + gui.score + ".");
         }
         else if (success == PLAYER_X){
-            gui.statusbar.setText("Player Won");
             gui.score = gui.score + gui.getWinScore() ;
             gui.updateScoreLabel();
-            showPlayAgainDialog("Congratulations ! You Won \n Your Score is : " + gui.score + " \n You are doing great !!."
-                    + "\nReady to Play Again ?");
+            gui.recordPlayerWin();
+            gui.showGameResult("You won. Your score is " + gui.score + ".");
         }
         else if (success == GAME_DRAW){
-            gui.statusbar.setText("Match Drawn");
             gui.score = gui.score - 50 ;
             gui.updateScoreLabel();
-            showPlayAgainDialog("Well ! Match Drawn \n Your Score becomes : " + gui.score + " \nDraw is same as Losing , Isnt it ?"
-                    + "\nWant to Win ? Play Again ?");
+            gui.recordDraw();
+            gui.showGameResult("Match drawn. Your score is " + gui.score + ".");
         }
 
         return true;
-    }
-
-    private void showPlayAgainDialog(String message) {
-        int result = JOptionPane.showConfirmDialog(
-        null,
-        message,
-        "Match Result !!",
-        JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION) {
-            startGame();
-        } else {
-            System.exit(0);
-        }
     }
 
     private void cycle() {
