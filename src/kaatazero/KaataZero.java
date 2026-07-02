@@ -33,111 +33,70 @@ public class KaataZero {
     /**
      * @param args the command line arguments
      */
-    public int[][] Matrix = new int[BOARD_SIZE][BOARD_SIZE];
-    public KaataZero(callGUI gui){
-        MReinitialize();
-        System.out.println("KaataZero Class Initiated");
+    public int[][] matrix = new int[BOARD_SIZE][BOARD_SIZE];
+
+    public KaataZero(){
+        reset();
     }
-    public void MReinitialize(){
+
+    public void reset(){
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
-                Matrix[row][col] = EMPTY_CELL;
+                matrix[row][col] = EMPTY_CELL;
             }
         }
-        System.out.println("KaataZero Class : Method MReinitialize");
     }
+
     
-    
-    
-    /*
-    public static void main(String[] args) {
-        // TODO code application logic here
-        System.out.println("Hi from Main function !");
-        
-        int[][] Matrix = new int[3][3];
-        int[][] Result;
-        //initializing matrix
-        for (int row = 0; row < BOARD_SIZE; row ++)
-            for (int col = 0; col < BOARD_SIZE; col++)
-                Matrix[row][col] = EMPTY_CELL;
-        
-        //printing matrix
-        System.out.println("Main : Prinitng Matrix");
+    public static void printMatrix(int[][] matrix){
         for (int row = 0; row < BOARD_SIZE; row ++){
             for (int col = 0; col < BOARD_SIZE; col++)
-                System.out.print(Matrix[row][col] + " ");
-            System.out.println();
-        }
-        
-        //Result=MSetPosition(Matrix,5,0);
-        //PrintMatrix(Result);
-        
-        //Result=MSet(Matrix,1,1,0);
-       
-        Result=MSetPosition(Matrix,5,0);
-        
-        System.out.println("Main : Prinitng Result Matrix");
-        for (int row = 0; row < 3; row ++){
-            for (int col = 0; col < 3; col++)
-                System.out.print(Result[row][col] + " ");
-            System.out.println();
-        }
-                
-        //System.out.println("Result from collegecomparison function is " + Result);
-    }*/
-    
-    public static void PrintMatrix(int[][]Matrix){
-        System.out.println("Class: KaataZero , Method : PrintMatrix : Prinitng Result Matrix");
-        for (int row = 0; row < BOARD_SIZE; row ++){
-            for (int col = 0; col < BOARD_SIZE; col++)
-                System.out.print(Matrix[row][col] + " ");
+                System.out.print(matrix[row][col] + " ");
             System.out.println();
         }
     }
-    public static int MFindValue(int[][] Matrix,int r,int c){
-        System.out.println("Class: KaataZero , MFindValue : Started");
-        return Matrix[r][c];
+
+    public static int findValue(int[][] matrix,int r,int c){
+        return matrix[r][c];
     }
     
-    public static int[][] MSet(int[][] Matrix,int r,int c,int value)
+    public static int[][] setValue(int[][] matrix,int r,int c,int value)
     {
-        System.out.println("Class: KaataZero , Method : MSet :Hi I am MSet method");
-        Matrix[r][c] = value;
-        return Matrix;
+        matrix[r][c] = value;
+        return matrix;
     }
-    public static int MSuccess(int[][] Matrix){
-        //0 computer won
-        //1 player 1
-        //999 match drawn
-        // 9 all ok
-       System.out.println("Class: KaataZero , Method : MSuccess");
+
+    public static int checkGameStatus(int[][] matrix){
+       return checkStatus(matrix);
+    }
+
+    public static int checkStatus(int[][] matrix) {
        for (int i = 0; i < WINNING_LINES.length; i++) {
-           int first = getPosition(Matrix, WINNING_LINES[i][0]);
-           int second = getPosition(Matrix, WINNING_LINES[i][1]);
-           int third = getPosition(Matrix, WINNING_LINES[i][2]);
+           int first = getPosition(matrix, WINNING_LINES[i][0]);
+           int second = getPosition(matrix, WINNING_LINES[i][1]);
+           int third = getPosition(matrix, WINNING_LINES[i][2]);
 
            if (first != EMPTY_CELL && first == second && second == third) {
                return first;
            }
        }
 
-       return isBoardFull(Matrix) ? GAME_DRAW : GAME_CONTINUE;
+       return isBoardFull(matrix) ? GAME_DRAW : GAME_CONTINUE;
     }
     
-    public static int[][] MSetPosition(int[][] Matrix,int position,int value)
+    public static int[][] setPosition(int[][] matrix,int position,int value)
     {
-        System.out.println("Class: KaataZero , Method : MSetPosition :Hi I am MSetPosition method");
         int row = rowFromPosition(position);
         int col = colFromPosition(position);
 
         if (row >= 0 && col >= 0) {
-            Matrix[row][col] = value;
+            matrix[row][col] = value;
         }
         
-        return Matrix;
+        return matrix;
     }
 
-    public static int getPosition(int[][] Matrix, int position) {
+    public static int getPosition(int[][] matrix, int position) {
         int row = rowFromPosition(position);
         int col = colFromPosition(position);
 
@@ -145,17 +104,17 @@ public class KaataZero {
             return EMPTY_CELL;
         }
 
-        return Matrix[row][col];
+        return matrix[row][col];
     }
 
-    public static boolean isEmptyPosition(int[][] Matrix, int position) {
-        return getPosition(Matrix, position) == EMPTY_CELL;
+    public static boolean isEmptyPosition(int[][] matrix, int position) {
+        return getPosition(matrix, position) == EMPTY_CELL;
     }
 
-    public static boolean isBoardFull(int[][] Matrix) {
+    public static boolean isBoardFull(int[][] matrix) {
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
-                if (Matrix[row][col] == EMPTY_CELL) {
+                if (matrix[row][col] == EMPTY_CELL) {
                     return false;
                 }
             }
@@ -169,7 +128,7 @@ public class KaataZero {
             return -1;
         }
 
-        return position % BOARD_SIZE;
+        return position / BOARD_SIZE;
     }
 
     public static int colFromPosition(int position) {
@@ -177,7 +136,7 @@ public class KaataZero {
             return -1;
         }
 
-        return position / BOARD_SIZE;
+        return position % BOARD_SIZE;
     }
     
 }

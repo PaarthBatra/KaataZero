@@ -32,7 +32,8 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 ## Technical Details
 
 ### Architecture
-- `callGUI.java`: Main application frame and UI components
+- `CallGUI.java`: Main application frame and UI components
+- `ComputerPlayer.java`: Computer move selection for Easy, Medium, and Hard difficulty
 - `Board.java`: Game board logic, mouse handling, and graphics rendering
 - `KaataZero.java`: Core game logic, matrix operations, and win detection
 

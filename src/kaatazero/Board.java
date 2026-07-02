@@ -22,9 +22,6 @@ import java.awt.Graphics2D;
 import java.awt.Toolkit;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -50,31 +47,28 @@ public class Board extends JPanel
     private final Color KAATAZEROCOLOUR = Color.WHITE;
     private final Color BACKGROUNDCOLOUR = Color.gray;
     private final int MARK_SIZE = 40;
-    private final int[][] CenterOfBoxes={{B_WIDTH/6,B_HEIGHT/6},{B_WIDTH/6,B_HEIGHT/2},{B_WIDTH/6,B_HEIGHT*5/6},
-                                         {B_WIDTH/2,B_HEIGHT/6},{B_WIDTH/2,B_HEIGHT/2},{B_WIDTH/2,B_HEIGHT*5/6},
-                                         {B_WIDTH*5/6,B_HEIGHT/6},{B_WIDTH*5/6,B_HEIGHT/2},{B_WIDTH*5/6,B_HEIGHT*5/6}};
+    private final int[][] CenterOfBoxes={{B_WIDTH/6,B_HEIGHT/6},{B_WIDTH/2,B_HEIGHT/6},{B_WIDTH*5/6,B_HEIGHT/6},
+                                         {B_WIDTH/6,B_HEIGHT/2},{B_WIDTH/2,B_HEIGHT/2},{B_WIDTH*5/6,B_HEIGHT/2},
+                                         {B_WIDTH/6,B_HEIGHT*5/6},{B_WIDTH/2,B_HEIGHT*5/6},{B_WIDTH*5/6,B_HEIGHT*5/6}};
     
     protected Thread animator;
     private int x, y,yReverse,xReverse;
-    public KaataZero M ;
-    public callGUI gui;
-    protected int CurrentValueAtMatrix;
+    public KaataZero game ;
+    public CallGUI gui;
     private boolean gameActive;
-    private final Random random = new Random();
+    private final ComputerPlayer computerPlayer = new ComputerPlayer();
     
-    public Board(callGUI gui1) {
+    public Board(CallGUI gui1) {
         gui = gui1;
-        M = new KaataZero(gui);
-        System.out.println("Board Class Initiated");
+        game = new KaataZero();
         initBoard(gui);
         
     }
 
     
     
-    private void initBoard(callGUI gui) {
+    private void initBoard(CallGUI gui) {
         
-        System.out.println("initBoard method : Board Class");
         this.setBackground(BACKGROUNDCOLOUR);
         this.addMouseListener(this);
         this.setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
@@ -84,7 +78,6 @@ public class Board extends JPanel
         yReverse = B_HEIGHT;
         xReverse = B_WIDTH;
         gameActive = false;
-        KaataZero.PrintMatrix(M.Matrix);
         
     }
 
@@ -103,7 +96,6 @@ public class Board extends JPanel
 
     private void drawBoard(Graphics g){
         
-        System.out.println("drawInitialCross method : Board Class");
         g.drawLine(B_WIDTH/3,-10,B_WIDTH/3,y);
         g.drawLine(B_WIDTH*2/3,B_HEIGHT + 10 ,B_WIDTH*2/3,yReverse +10 );
         g.drawLine(-10,B_HEIGHT/3,x,B_HEIGHT/3);
@@ -116,7 +108,7 @@ public class Board extends JPanel
 
     private void drawMoves(Graphics g) {
         for (int position = 0; position < BOARD_SIZE * BOARD_SIZE; position++) {
-            int value = KaataZero.getPosition(M.Matrix, position);
+            int value = KaataZero.getPosition(game.matrix, position);
             int centerX = CenterOfBoxes[position][0];
             int centerY = CenterOfBoxes[position][1];
 
@@ -129,66 +121,45 @@ public class Board extends JPanel
     }
 
     public void PlayersMove(int position){
-        if (!gameActive || !"Player".equals(gui.Move) || !KaataZero.isEmptyPosition(M.Matrix, position)) {
+        if (!gameActive || !"Player".equals(gui.move) || !KaataZero.isEmptyPosition(game.matrix, position)) {
             return;
         }
 
-        System.out.println("Setting Value at position " + position + " as : 1");
-        KaataZero.MSetPosition(M.Matrix,position,PLAYER_X);
+        KaataZero.setPosition(game.matrix,position,PLAYER_X);
         repaint();
-        KaataZero.PrintMatrix(M.Matrix);
 
         if (handleGameStatus()) {
             return;
         }
 
-        gui.Move="Computer";
-        gui.moveLabel.setText("Move : " + gui.Move);
+        gui.move="Computer";
+        gui.moveLabel.setText("Move : " + gui.move);
         ComputersMove();
     }
 
     public void ComputersMove(){
-        System.out.println("ComputersMove method : Board Class");
-
-        if (!gameActive || !"Computer".equals(gui.Move)) {
+        if (!gameActive || !"Computer".equals(gui.move)) {
             return;
         }
 
-        int position = chooseComputerPosition();
+        int position = computerPlayer.chooseMove(game.matrix, gui.difficulty);
 
         if (position == -1) {
             handleGameStatus();
             return;
         }
 
-        System.out.println("Setting Value at position " + position + " as : 0");
-        KaataZero.MSetPosition(M.Matrix,position,PLAYER_O);
+        KaataZero.setPosition(game.matrix,position,PLAYER_O);
         repaint();
-        KaataZero.PrintMatrix(M.Matrix);
 
         if (!handleGameStatus()) {
-            gui.Move="Player";
-            gui.moveLabel.setText("Move : " + gui.Move);
+            gui.move="Player";
+            gui.moveLabel.setText("Move : " + gui.move);
         }
-    }
-
-    private int chooseComputerPosition() {
-        List<Integer> emptyPositions = new ArrayList<Integer>();
-        for (int position = 0; position < BOARD_SIZE * BOARD_SIZE; position++) {
-            if (KaataZero.isEmptyPosition(M.Matrix, position)) {
-                emptyPositions.add(Integer.valueOf(position));
-            }
-        }
-
-        if (emptyPositions.isEmpty()) {
-            return -1;
-        }
-
-        return emptyPositions.get(random.nextInt(emptyPositions.size())).intValue();
     }
 
     private boolean handleGameStatus() {
-        int success = KaataZero.MSuccess(M.Matrix);
+        int success = KaataZero.checkGameStatus(game.matrix);
 
         if (success == GAME_CONTINUE) {
             return false;
@@ -198,23 +169,23 @@ public class Board extends JPanel
 
         if (success == PLAYER_O){
             gui.statusbar.setText("Computer Won");
-            gui.Score = 0 ;
-            gui.scoreLabel.setText("Score : " + gui.Score);
-            showPlayAgainDialog("Oops ! Computer Won \n Your Score becomes : " + gui.Score + " \n Try hard buddy."
+            gui.score = 0 ;
+            gui.scoreLabel.setText("Score : " + gui.score);
+            showPlayAgainDialog("Oops ! Computer Won \n Your Score becomes : " + gui.score + " \n Try hard buddy."
                     + "\nReady to Play Again?");
         }
         else if (success == PLAYER_X){
             gui.statusbar.setText("Player Won");
-            gui.Score = gui.Score + 100 ;
-            gui.scoreLabel.setText("Score : " + gui.Score);
-            showPlayAgainDialog("Congratulations ! You Won \n Your Score is : " + gui.Score + " \n You are doing great !!."
+            gui.score = gui.score + 100 ;
+            gui.scoreLabel.setText("Score : " + gui.score);
+            showPlayAgainDialog("Congratulations ! You Won \n Your Score is : " + gui.score + " \n You are doing great !!."
                     + "\nReady to Play Again ?");
         }
         else if (success == GAME_DRAW){
             gui.statusbar.setText("Match Drawn");
-            gui.Score = gui.Score - 100 ;
-            gui.scoreLabel.setText("Score : " + gui.Score);
-            showPlayAgainDialog("Well ! Match Drawn \n Your Score becomes : " + gui.Score + " \nDraw is same as Losing , Isnt it ?"
+            gui.score = gui.score - 100 ;
+            gui.scoreLabel.setText("Score : " + gui.score);
+            showPlayAgainDialog("Well ! Match Drawn \n Your Score becomes : " + gui.score + " \nDraw is same as Losing , Isnt it ?"
                     + "\nWant to Win ? Play Again ?");
         }
 
@@ -228,7 +199,6 @@ public class Board extends JPanel
         "Match Result !!",
         JOptionPane.YES_NO_OPTION);
         if (result == JOptionPane.YES_OPTION) {
-            System.out.println("YES is clicked");
             startGame();
         } else {
             System.exit(0);
@@ -247,7 +217,6 @@ public class Board extends JPanel
     @Override
     public void addNotify() {
         super.addNotify();
-        System.out.println("addNotify method : Board Class");
 
         if (animator == null || !animator.isAlive()) {
             animator = new Thread(this);
@@ -259,7 +228,6 @@ public class Board extends JPanel
     public void paintComponent(Graphics g) {
         
         super.paintComponent(g);
-        System.out.println("paintComponent method : Board Class");
         Graphics2D g2d = (Graphics2D) g;
         g2d.setStroke(new BasicStroke(STROKESIZE));
         g2d.setColor(KAATAZEROCOLOUR);
@@ -269,9 +237,9 @@ public class Board extends JPanel
     }
 
     public void startGame() {
-        M.MReinitialize();
-        gui.Move = "Computer";
-        gui.moveLabel.setText("Move : " + gui.Move);
+        game.reset();
+        gui.move = "Computer";
+        gui.moveLabel.setText("Move : " + gui.move);
         gui.statusbar.setText("Game is Running");
         x = INITIAL_X;
         y = INITIAL_Y;
@@ -287,7 +255,6 @@ public class Board extends JPanel
     //run method of the thread called in addNotify()
     @Override
     public void run() {
-        System.out.println("run method : Board Class");
         long beforeTime, timeDiff, sleep;
 
         beforeTime = System.currentTimeMillis();
@@ -335,16 +302,13 @@ public class Board extends JPanel
     //Mouse Events
     @Override
     public void mousePressed(MouseEvent evt) {
-        System.out.println("Mouse is Pressed");
         
     }
     
     @Override
     public void mouseReleased(MouseEvent evt) {
-        System.out.println("Mouse is Released");
         int mx = evt.getX();
         int my = evt.getY();
-        System.out.println("Value of B_WIDTH and B_HEIGHT are " + B_WIDTH + " :  " + B_HEIGHT);
 
         if (mx < 0 || mx >= B_WIDTH || my < 0 || my >= B_HEIGHT) {
             return;
@@ -352,27 +316,21 @@ public class Board extends JPanel
 
         int col = mx / (B_WIDTH / BOARD_SIZE);
         int row = my / (B_HEIGHT / BOARD_SIZE);
-        int position = (col * BOARD_SIZE) + row;
+        int position = (row * BOARD_SIZE) + col;
 
-        System.out.println("Kaata to be drawn in " + position + " Box");
         PlayersMove(position);
-        
-        System.out.println("Circle drawn on mx , my  as center: " + mx  + "  " + my);
       }
      
     @Override
     public void mouseExited(MouseEvent evt) {
-        System.out.println("Mouse is Exited");
     }
     
     @Override
     public void mouseEntered(MouseEvent evt) {
-        System.out.println("Mouse is mouseEntered");
     }
           
     @Override
     public void mouseClicked(MouseEvent evt) {
-        System.out.println("Mouse is mouseClicked");
     }
     
     
