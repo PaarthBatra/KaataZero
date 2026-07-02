@@ -23,8 +23,10 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 - **Restart Button**: Restart the current setup without closing the game
 - **Mute Option**: Turn game beeps on or off from the controls
 - **Session History**: Track player wins, opponent wins, and draws while the app is open
-- **Keyboard Shortcuts**: Use `R` to restart, `Esc` to quit, and `1`-`9` to play board cells
+- **Undo and Reset**: Undo the latest move and reset the score/history counters
+- **Keyboard Shortcuts**: Use `R` to restart, `U` to undo, `S` to reset score/history, `Esc` to quit, and `1`-`9` to play board cells
 - **In-Window Results**: Game results appear in the status area instead of interrupting play with popups
+- **Difficulty Help**: The UI explains the selected difficulty mode
 - **Animated Board**: Smooth drawing animations for game board
 - **Menu System**: File and Help menus with game controls
 - **Status Tracking**: Real-time display of current move, mode, difficulty, starter, and score
@@ -40,7 +42,7 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 4. Pick a difficulty and starter for computer games
 5. Click on any empty square to place your mark
 6. First to get three in a row (horizontally, vertically, or diagonally) wins
-7. Use Restart or press `R` when the game ends
+7. Use Restart, Undo, Reset, or the matching keyboard shortcuts while playing
 
 ## Technical Details
 
@@ -59,6 +61,8 @@ KaataZero is a classic Tic-Tac-Toe implementation where players compete against 
 - Java Swing for GUI components
 - Custom graphics and animations
 - Runnable JAR can be built from the compiled classes
+- Installer script installs the EXE launcher and bundled JAR
+- Plain Java logic tests are available under `test/`
 
 ## Installation & Running
 
@@ -71,6 +75,12 @@ Build it manually with:
 ```bash
 javac -d build/classes src/kaatazero/*.java
 jar cfe dist/KaataZero.jar kaatazero.CallGUI -C build/classes .
+```
+
+Run logic tests with:
+```powershell
+javac -cp build/classes -d build/test/classes test/kaatazero/*.java
+java -cp "build/classes;build/test/classes" kaatazero.KaataZeroLogicTest
 ```
 
 ### Option 2: Windows Installer
@@ -91,6 +101,7 @@ jar cfe dist/KaataZero.jar kaatazero.CallGUI -C build/classes .
 - Installer updated to use new domain and correct resource paths
 - Added difficulty modes, local 2 Player mode, restart control, saved settings, and winning-line highlighting
 - Added mute control, session history, keyboard shortcuts, in-window results, and runnable JAR packaging
+- Added undo/reset controls, difficulty help text, installer launcher updates, resource fallbacks, and logic tests
 
 ## License
 

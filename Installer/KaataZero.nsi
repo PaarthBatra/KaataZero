@@ -26,7 +26,7 @@
 	!define IMAGEDIR "../images"
 	!define PROGDIR "../dist"
 	!define OUTDIR "../GeneratedEXE"
-	!define EXENAME "KaataZero.jar"
+	!define EXENAME "KaataZero.exe"
 	!define ICONNAME "Icon.ico"
 	
 	
@@ -90,6 +90,7 @@ Section "KaataZero" FilesADD
 	
 
     file "${PROGDIR}\KaataZero.jar"
+	file "${PROGDIR}\KaataZero.exe"
 	file "${PROGDIR}\README.TXT"
 	file "${IMAGEDIR}\Icon.ico"
 
@@ -101,7 +102,7 @@ Section "KaataZero" FilesADD
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "UninstallString" "$\"$INSTDIR\uninstall.exe$\""
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "QuietUninstallString" "$\"$INSTDIR\uninstall.exe$\" /S"
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "InstallLocation" "$\"$INSTDIR$\""
-	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "DisplayIcon" "$\"$INSTDIR\KaataZero.ico$\""
+	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "DisplayIcon" "$\"$INSTDIR\${ICONNAME}$\""
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "Publisher" "$\"${COMPANYNAME}$\""
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "HelpLink" "$\"${HELPURL}$\""
 	WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\${COMPANYNAME} ${APPNAME}" "URLUpdateInfo" "$\"${UPDATEURL}$\""
@@ -162,6 +163,7 @@ Section "Uninstall"
 	# Remove files
 	
 	delete "$INSTDIR\KaataZero.jar"
+	delete "$INSTDIR\KaataZero.exe"
 	delete "$INSTDIR\README.TXT"
 	delete "$INSTDIR\Icon.ico"
   # Always delete uninstaller as the last action

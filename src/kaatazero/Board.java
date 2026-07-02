@@ -59,6 +59,8 @@ public class Board extends JPanel
     private boolean boardReady;
     private int currentPlayer;
     private int[] winningLine;
+    private int[] moveHistory = new int[BOARD_SIZE * BOARD_SIZE];
+    private int moveHistoryCount;
     private final ComputerPlayer computerPlayer = new ComputerPlayer();
     
     public Board(CallGUI gui1) {
@@ -146,6 +148,7 @@ public class Board extends JPanel
         }
 
         KaataZero.setPosition(game.matrix,position,currentPlayer);
+        rememberMove(position);
         gui.playMoveSound();
         repaint();
 
@@ -177,6 +180,7 @@ public class Board extends JPanel
         }
 
         KaataZero.setPosition(game.matrix,position,PLAYER_O);
+        rememberMove(position);
         gui.playMoveSound();
         repaint();
 
@@ -267,6 +271,7 @@ public class Board extends JPanel
     public void startGame() {
         game.reset();
         winningLine = null;
+        moveHistoryCount = 0;
         currentPlayer = shouldComputerStart() ? PLAYER_O : PLAYER_X;
         gui.move = startingMoveText();
         gui.moveLabel.setText("Move : " + gui.move);
@@ -381,6 +386,47 @@ public class Board extends JPanel
 
         PlayersMove(position);
       }
+
+    public void undoLastMove() {
+        if (!boardReady || moveHistoryCount == 0 || winningLine != null) {
+            return;
+        }
+
+        if (isPlayerVsPlayerMode()) {
+            undoSingleMove();
+            currentPlayer = currentPlayer == PLAYER_X ? PLAYER_O : PLAYER_X;
+            updateTurnLabel();
+        } else {
+            undoSingleMove();
+
+            if (moveHistoryCount > 0) {
+                undoSingleMove();
+            }
+
+            currentPlayer = PLAYER_X;
+            gui.move = "Player";
+            gui.moveLabel.setText("Move : " + gui.move);
+        }
+
+        gui.statusbar.setText("Last move undone");
+        repaint();
+    }
+
+    private void rememberMove(int position) {
+        if (moveHistoryCount < moveHistory.length) {
+            moveHistory[moveHistoryCount] = position;
+            moveHistoryCount++;
+        }
+    }
+
+    private void undoSingleMove() {
+        if (moveHistoryCount == 0) {
+            return;
+        }
+
+        moveHistoryCount--;
+        KaataZero.setPosition(game.matrix, moveHistory[moveHistoryCount], KaataZero.EMPTY_CELL);
+    }
      
     @Override
     public void mouseExited(MouseEvent evt) {

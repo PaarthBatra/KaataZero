@@ -5,9 +5,11 @@ import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.Insets;
+import java.awt.Cursor;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,6 +45,8 @@ public class CallGUI extends JFrame {
     private static final String PREF_DIFFICULTY = "difficulty";
     private static final String PREF_STARTING_PLAYER = "startingPlayer";
     private static final String PREF_SOUND_ENABLED = "soundEnabled";
+    private static final Color PANEL_BACKGROUND = new Color(238, 238, 238);
+    private static final Color STATUS_BACKGROUND = new Color(245, 245, 245);
 
     protected boolean gameRunning;
     public String move = "Computer";
@@ -53,6 +57,7 @@ public class CallGUI extends JFrame {
     protected JLabel moveLabel = new JLabel();
     protected JLabel statusbar = new JLabel("Click Start Button to Start Game");
     protected JLabel historyLabel = new JLabel();
+    protected JLabel difficultyInfoLabel = new JLabel();
     protected int score = 0;
     protected int playerWins = 0;
     protected int opponentWins = 0;
@@ -119,6 +124,7 @@ public class CallGUI extends JFrame {
        final JPanel panel = new JPanel();
 
        JButton playButton = new JButton("Play");
+       playButton.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
        panel.setLayout(null);
 
        ImageIcon icon = loadImageIcon("Splash.png");
@@ -126,9 +132,10 @@ public class CallGUI extends JFrame {
        if (icon != null) {
            thumb.setIcon(icon);
        } else {
+           thumb.setFont(new Font("SansSerif", Font.BOLD, 28));
            thumb.setForeground(Color.WHITE);
            thumb.setHorizontalAlignment(JLabel.CENTER);
-           thumb.setText("Kaata Zero");
+           thumb.setText("<html><div style='text-align:center'>Kaata Zero<br><span style='font-size:12px'>Tic Tac Toe</span></div></html>");
        }
        panel.add(playButton);
        panel.add(thumb);
@@ -154,6 +161,7 @@ public class CallGUI extends JFrame {
        final JCheckBox soundCheck = new JCheckBox("Sound", soundEnabled);
        soundCheck.setFocusable(false);
        soundCheck.setMargin(new Insets(0, 0, 0, 0));
+       updateDifficultyInfo();
        modeCombo.addActionListener(new ActionListener() {
            @Override
            public void actionPerformed(ActionEvent e) {
@@ -161,6 +169,7 @@ public class CallGUI extends JFrame {
                difficultyCombo.setEnabled("Computer".equals(gameMode));
                starterCombo.setEnabled("Computer".equals(gameMode));
                statusbar.setText("Mode set to " + gameMode);
+               updateDifficultyInfo();
                saveSettings();
            }
        });
@@ -169,6 +178,7 @@ public class CallGUI extends JFrame {
            public void actionPerformed(ActionEvent e) {
                difficulty = (String) difficultyCombo.getSelectedItem();
                statusbar.setText("Difficulty set to " + difficulty);
+               updateDifficultyInfo();
                saveSettings();
            }
        });
@@ -194,16 +204,26 @@ public class CallGUI extends JFrame {
        restartButton.setMargin(new Insets(2, 4, 2, 4));
        restartButton.setPreferredSize(new Dimension(72, 24));
        restartButton.setEnabled(false);
+       final JButton undoButton = new JButton("Undo");
+       undoButton.setMargin(new Insets(2, 4, 2, 4));
+       undoButton.setPreferredSize(new Dimension(58, 24));
+       undoButton.setEnabled(false);
+       final JButton resetButton = new JButton("Reset");
+       resetButton.setMargin(new Insets(2, 4, 2, 4));
+       resetButton.setPreferredSize(new Dimension(58, 24));
 
        JToolBar primaryToolbar = createControlToolbar();
        JToolBar secondaryToolbar = createControlToolbar();
        JToolBar historyToolbar = createControlToolbar();
-       JPanel bottomPanel = new JPanel(new GridLayout(3, 1));
-       bottomPanel.setPreferredSize(new Dimension(final_width, 87));
-       bottomPanel.setMinimumSize(new Dimension(final_width, 87));
-       bottomPanel.setMaximumSize(new Dimension(final_width, 87));
+       JToolBar infoToolbar = createControlToolbar();
+       JPanel bottomPanel = new JPanel(new GridLayout(4, 1));
+       bottomPanel.setPreferredSize(new Dimension(final_width, 116));
+       bottomPanel.setMinimumSize(new Dimension(final_width, 116));
+       bottomPanel.setMaximumSize(new Dimension(final_width, 116));
 
        statusbar.setPreferredSize(new Dimension(final_width, 22));
+       statusbar.setOpaque(true);
+       statusbar.setBackground(STATUS_BACKGROUND);
        statusbar.setBorder(LineBorder.createGrayLineBorder());
        add(statusbar, BorderLayout.NORTH);
        final Board board = new Board(this);
@@ -215,6 +235,7 @@ public class CallGUI extends JFrame {
        moveLabel.setPreferredSize(new Dimension(72, 24));
        scoreLabel.setPreferredSize(new Dimension(52, 24));
        historyLabel.setPreferredSize(new Dimension(148, 24));
+       difficultyInfoLabel.setPreferredSize(new Dimension(final_width - 8, 24));
        updateHistoryLabel();
        primaryToolbar.add(moveLabel);
        primaryToolbar.addSeparator(separator);
@@ -229,18 +250,22 @@ public class CallGUI extends JFrame {
        secondaryToolbar.add(scoreLabel);
        secondaryToolbar.addSeparator(separator);
        secondaryToolbar.add(restartButton);
+       secondaryToolbar.addSeparator(separator);
+       secondaryToolbar.add(undoButton);
        historyToolbar.add(historyLabel);
        historyToolbar.addSeparator(separator);
        historyToolbar.add(soundCheck);
        historyToolbar.addSeparator(separator);
-       historyToolbar.add(new JLabel("Keys: R, Esc, 1-9"));
+       historyToolbar.add(resetButton);
+       infoToolbar.add(difficultyInfoLabel);
        bottomPanel.add(primaryToolbar);
        bottomPanel.add(secondaryToolbar);
        bottomPanel.add(historyToolbar);
+       bottomPanel.add(infoToolbar);
        difficultyCombo.setEnabled("Computer".equals(gameMode));
        starterCombo.setEnabled("Computer".equals(gameMode));
        add(panel,BorderLayout.CENTER);
-       installKeyboardShortcuts(board, restartButton);
+       installKeyboardShortcuts(board, restartButton, undoButton, resetButton);
 
        playButton.addActionListener(new ActionListener() {
            @Override
@@ -252,9 +277,11 @@ public class CallGUI extends JFrame {
                    board.startGame();
                    gameRunning=true;
                    restartButton.setEnabled(true);
+                   undoButton.setEnabled(true);
                }
                else{
                    board.startGame();
+                   undoButton.setEnabled(true);
                }
            }
        });
@@ -263,6 +290,18 @@ public class CallGUI extends JFrame {
            public void actionPerformed(ActionEvent e) {
                board.startGame();
                statusbar.setText("Game restarted");
+           }
+       });
+       undoButton.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               board.undoLastMove();
+           }
+       });
+       resetButton.addActionListener(new ActionListener() {
+           @Override
+           public void actionPerformed(ActionEvent e) {
+               resetScoreAndHistory();
            }
        });
 
@@ -279,6 +318,7 @@ public class CallGUI extends JFrame {
        toolbar.setFloatable(false);
        toolbar.setRollover(true);
        toolbar.setMargin(new Insets(3, 2, 2, 2));
+       toolbar.setBackground(PANEL_BACKGROUND);
        toolbar.setPreferredSize(new Dimension(final_width, 29));
        toolbar.setMinimumSize(new Dimension(final_width, 29));
        toolbar.setMaximumSize(new Dimension(final_width, 29));
@@ -320,6 +360,33 @@ public class CallGUI extends JFrame {
         historyLabel.setText("You:" + playerWins + " Opp:" + opponentWins + " Draw:" + draws);
     }
 
+    public void updateDifficultyInfo() {
+        String info;
+
+        if ("2 Player".equals(gameMode)) {
+            info = "2 Player: take turns locally. Keys: U undo, R restart.";
+        } else if ("Hard".equals(difficulty)) {
+            info = "Hard: perfect minimax AI. Keys: 1-9 cells, U undo.";
+        } else if ("Medium".equals(difficulty)) {
+            info = "Medium: sometimes wins or blocks. Keys: 1-9 cells.";
+        } else {
+            info = "Easy: random computer moves. Keys: R restart, Esc quit.";
+        }
+
+        difficultyInfoLabel.setText(info);
+        difficultyInfoLabel.setFont(difficultyInfoLabel.getFont().deriveFont(Font.PLAIN, 11f));
+    }
+
+    public void resetScoreAndHistory() {
+        score = 0;
+        playerWins = 0;
+        opponentWins = 0;
+        draws = 0;
+        updateScoreLabel();
+        updateHistoryLabel();
+        statusbar.setText("Score and history reset");
+    }
+
     public void recordPlayerWin() {
         playerWins++;
         updateHistoryLabel();
@@ -355,7 +422,8 @@ public class CallGUI extends JFrame {
         Toolkit.getDefaultToolkit().beep();
     }
 
-    private void installKeyboardShortcuts(final Board board, final JButton restartButton) {
+    private void installKeyboardShortcuts(final Board board, final JButton restartButton,
+            final JButton undoButton, final JButton resetButton) {
         JComponent rootPane = getRootPane();
 
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_R, 0), "restartGame");
@@ -374,6 +442,24 @@ public class CallGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.exit(0);
+            }
+        });
+
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_U, 0), "undoMove");
+        rootPane.getActionMap().put("undoMove", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (undoButton.isEnabled()) {
+                    board.undoLastMove();
+                }
+            }
+        });
+
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_S, 0), "resetScore");
+        rootPane.getActionMap().put("resetScore", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                resetButton.doClick();
             }
         });
 
@@ -403,6 +489,12 @@ public class CallGUI extends JFrame {
             Image newimg = img.getScaledInstance(100, 100, java.awt.Image.SCALE_SMOOTH);
             JLabel imageLabel = new JLabel(new ImageIcon((newimg)));
             panel.add(imageLabel,BorderLayout.CENTER);
+        } else {
+            JLabel fallbackImage = new JLabel("KZ");
+            fallbackImage.setFont(new Font("SansSerif", Font.BOLD, 36));
+            fallbackImage.setHorizontalAlignment(JLabel.CENTER);
+            fallbackImage.setPreferredSize(new Dimension(100, 100));
+            panel.add(fallbackImage,BorderLayout.CENTER);
         }
 
         JOptionPane.showMessageDialog(null, panel, "AboutUs", JOptionPane.PLAIN_MESSAGE, null);
