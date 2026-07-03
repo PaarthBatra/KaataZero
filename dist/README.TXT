@@ -1,71 +1,66 @@
-# KaataZero
+KaataZero
+=========
 
-A Java-based Tic-Tac-Toe game featuring player vs computer gameplay with a graphical user interface.
+A Java Swing Tic-Tac-Toe game with player vs computer and local 2-player modes.
 
-## Game Overview
+Version: 2.0.0.0
+Release Date: July 4, 2026
 
-KaataZero is a classic Tic-Tac-Toe implementation where players compete against an AI computer opponent on a 3x3 grid. The computer uses "0" symbols while the player uses "X" symbols.
+Game Overview
+-------------
 
-## Features
+KaataZero is played on a 3x3 grid. In computer mode, you play X against the
+computer's O. In 2-player mode, two people take turns on the same machine.
 
-- **Player vs Computer**: Human player competes against AI opponent
-- **Scoring System**: 
-  - Win: +100 points
-  - Loss: Score resets to 0
-  - Draw: -100 points
-- **Visual Interface**: Clean Java Swing GUI with custom graphics
-- **Animated Board**: Smooth drawing animations for game board
-- **Menu System**: File and Help menus with game controls
-- **Status Tracking**: Real-time display of current move and score
+Features
+--------
 
-## How to Play
+- Player vs Computer with Easy, Medium, and Hard AI
+- Local 2 Player mode
+- Winning-line highlight, restart, undo, and reset controls
+- Score tracking and persistent win/loss/draw history
+- Color skins, saved settings, and mute option
+- Keyboard shortcuts and in-window match results
+- Clickable website link: www.versionpb.co.in
 
-1. Launch the game using `KaataZero.jar` or `KaataZero.exe`
-2. Click "Play" to start a new game
-3. The computer makes the first move (places a "0")
-4. Click on any empty square to place your "X"
-5. First to get three in a row (horizontally, vertically, or diagonally) wins
-6. Play again or exit when the game ends
+How to Play
+-----------
 
-## Technical Details
+1. Launch KaataZero.exe or KaataZero.jar
+2. Click Play on the splash screen
+3. Use Settings > Game Settings to choose mode, difficulty, starter, skin, and sound
+4. Click an empty square to place your mark
+5. Get three in a row to win
 
-### Architecture
-- **callGUI.java**: Main application frame and UI components
-- **Board.java**: Game board logic, mouse handling, and graphics rendering
-- **KaataZero.java**: Core game logic, matrix operations, and win detection
+Keyboard Shortcuts
+------------------
 
-### Requirements
-- Java Runtime Environment (JRE)
-- Java Swing support
+R      Restart game
+U      Undo latest move
+S      Reset score and history
+Esc    Exit
+1-9    Play board cells (top-left = 1, bottom-right = 9)
 
-### Build Information
-- Built with NetBeans IDE
-- Java Swing for GUI components
-- Custom graphics and animations
-- Executable JAR and Windows executable included
+Running
+-------
 
-## Installation & Running
+Windows:
+  Double-click KaataZero.exe
 
-### Option 1: JAR File
-```bash
-java -jar KaataZero.jar
-```
+JAR:
+  java -jar KaataZero.jar
 
-### Option 2: Windows Executable
-Double-click `KaataZero.exe` to run directly on Windows.
+Author
+------
 
-## Author
+Paarth Batra
+Email: paarth.batra@gmail.com
+Website: www.versionpb.co.in
 
-**Paarth Batra**
-- Email: paarth_batra@yahoo.co.in, paarthh2@rediffmail.com
-- Website: www.versionpb.co.in
-- Version: 1.0.0.0
-- Release Date: December 7, 2015
+License
+-------
 
-## License
+This project appears to be a personal/educational implementation.
+Please contact the author for licensing information.
 
-This project appears to be a personal/educational implementation. Please contact the author for licensing information.
-
----
-
-*KaataZero - The best way to pass time!*
+KaataZero - The best way to pass time!

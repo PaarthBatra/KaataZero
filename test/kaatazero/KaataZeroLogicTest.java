@@ -1,5 +1,8 @@
 package kaatazero;
 
+/**
+ * Lightweight tests for core {@link KaataZero} board logic.
+ */
 public class KaataZeroLogicTest {
 
     public static void main(String[] args) {

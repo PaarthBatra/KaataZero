@@ -4,6 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * Selects computer moves for Easy, Medium, and Hard difficulty levels.
+ * Easy is random, Medium mixes tactical and random play, and Hard uses minimax.
+ */
 public class ComputerPlayer {
 
     private static final int MEDIUM_TACTICAL_PERCENT = 65;

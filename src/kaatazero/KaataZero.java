@@ -6,6 +6,8 @@
 package kaatazero;
 
 /**
+ * Core Tic-Tac-Toe board model and game-state helpers.
+ * Stores the 3x3 matrix, maps flat positions to rows/columns, and detects wins and draws.
  *
  * @author Paarth Batra
  */

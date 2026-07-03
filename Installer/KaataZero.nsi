@@ -13,9 +13,9 @@
 	!define COMPANYNAME "VersionPB"
 	!define DESCRIPTION "Kaata Zero is the Best way to pass time"
 	# These three must be integers
-	!define VERSIONMAJOR 1
-	!define VERSIONMINOR 1
-	!define VERSIONBUILD 1.0.0.0
+	!define VERSIONMAJOR 2
+	!define VERSIONMINOR 0
+	!define VERSIONBUILD 2.0.0.0
 	# These will be displayed by the "Click here for support information" link in "Add/Remove Programs"
 	# It is possible to use "mailto:" links in here to open the email client
 	!define HELPURL "http://www.versionpb.co.in" # "Support Information" link

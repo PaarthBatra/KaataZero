@@ -1,19 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package kaatazero;
 
-/**
- *
- * @author Paarth Batra
- */
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -25,7 +11,12 @@ import java.awt.event.MouseListener;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
-
+/**
+ * Animated game board panel that handles drawing, mouse input, undo, and match flow.
+ * Delegates AI turns to {@link ComputerPlayer} and game-state checks to {@link KaataZero}.
+ *
+ * @author Paarth Batra
+ */
 public class Board extends JPanel
         implements Runnable,MouseListener {
 
@@ -43,9 +34,11 @@ public class Board extends JPanel
     private final int INITIAL_Y = -40;
     private final int DELAY = 2;
     private final int STROKESIZE =10;
-    private final Color KAATAZEROCOLOUR = Color.WHITE;
-    private final Color WIN_LINE_COLOUR = Color.YELLOW;
-    private final Color BACKGROUNDCOLOUR = Color.gray;
+    private Color gridColour = Color.WHITE;
+    private Color playerXColour = Color.WHITE;
+    private Color playerOColour = Color.WHITE;
+    private Color winLineColour = Color.YELLOW;
+    private Color backgroundColour = Color.gray;
     private final int MARK_SIZE = 40;
     private final int[][] CenterOfBoxes={{B_WIDTH/6,B_HEIGHT/6},{B_WIDTH/2,B_HEIGHT/6},{B_WIDTH*5/6,B_HEIGHT/6},
                                          {B_WIDTH/6,B_HEIGHT/2},{B_WIDTH/2,B_HEIGHT/2},{B_WIDTH*5/6,B_HEIGHT/2},
@@ -61,6 +54,7 @@ public class Board extends JPanel
     private int[] winningLine;
     private int[] moveHistory = new int[BOARD_SIZE * BOARD_SIZE];
     private int moveHistoryCount;
+    private boolean computerMovePending;
     private final ComputerPlayer computerPlayer = new ComputerPlayer();
     
     public Board(CallGUI gui1) {
@@ -74,7 +68,7 @@ public class Board extends JPanel
     
     private void initBoard(CallGUI gui) {
         
-        this.setBackground(BACKGROUNDCOLOUR);
+        applySkin();
         this.addMouseListener(this);
         this.setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
         this.setDoubleBuffered(true);
@@ -88,20 +82,21 @@ public class Board extends JPanel
     }
 
     private void drawZero(Graphics g,int CenterX , int CenterY){
-        g.setColor(KAATAZEROCOLOUR);
+        g.setColor(playerOColour);
         g.drawOval(CenterX - (MARK_SIZE / 2), CenterY - (MARK_SIZE / 2), MARK_SIZE, MARK_SIZE);
         
     }
 
     private void drawCross(Graphics g, int centerX, int centerY) {
         int halfMark = MARK_SIZE / 2;
-        g.setColor(KAATAZEROCOLOUR);
+        g.setColor(playerXColour);
         g.drawLine(centerX - halfMark, centerY + halfMark, centerX + halfMark, centerY - halfMark);
         g.drawLine(centerX - halfMark, centerY - halfMark, centerX + halfMark, centerY + halfMark);
     }
 
     private void drawBoard(Graphics g){
         
+        g.setColor(gridColour);
         g.drawLine(B_WIDTH/3,-10,B_WIDTH/3,y);
         g.drawLine(B_WIDTH*2/3,B_HEIGHT + 10 ,B_WIDTH*2/3,yReverse +10 );
         g.drawLine(-10,B_HEIGHT/3,x,B_HEIGHT/3);
@@ -133,7 +128,7 @@ public class Board extends JPanel
         }
 
         Graphics2D g2d = (Graphics2D) g;
-        g2d.setColor(WIN_LINE_COLOUR);
+        g2d.setColor(winLineColour);
         g2d.setStroke(new BasicStroke(STROKESIZE + 2));
 
         int startPosition = winningLine[0];
@@ -163,11 +158,12 @@ public class Board extends JPanel
             currentPlayer = PLAYER_O;
             gui.move="Computer";
             gui.moveLabel.setText("Move : " + gui.move);
-            ComputersMove();
+            scheduleComputerMove();
         }
     }
 
     public void ComputersMove(){
+        computerMovePending = false;
         if (!gameActive || isPlayerVsPlayerMode() || !"Computer".equals(gui.move)) {
             return;
         }
@@ -262,16 +258,26 @@ public class Board extends JPanel
         super.paintComponent(g);
         Graphics2D g2d = (Graphics2D) g;
         g2d.setStroke(new BasicStroke(STROKESIZE));
-        g2d.setColor(KAATAZEROCOLOUR);
         
         drawBoard(g2d);
         
+    }
+
+    public void applySkin() {
+        backgroundColour = gui.getBoardBackgroundColor();
+        gridColour = gui.getGridColor();
+        playerXColour = gui.getPlayerXColor();
+        playerOColour = gui.getPlayerOColor();
+        winLineColour = gui.getWinLineColor();
+        setBackground(backgroundColour);
+        repaint();
     }
 
     public void startGame() {
         game.reset();
         winningLine = null;
         moveHistoryCount = 0;
+        computerMovePending = false;
         currentPlayer = shouldComputerStart() ? PLAYER_O : PLAYER_X;
         gui.move = startingMoveText();
         gui.moveLabel.setText("Move : " + gui.move);
@@ -330,11 +336,27 @@ public class Board extends JPanel
                     if (isPlayerVsPlayerMode()) {
                         updateTurnLabel();
                     } else {
-                        ComputersMove();
+                        scheduleComputerMove();
                     }
                 }
             });
         }
+    }
+
+    private void scheduleComputerMove() {
+        if (computerMovePending || !gameActive || isPlayerVsPlayerMode()) {
+            return;
+        }
+
+        computerMovePending = true;
+        javax.swing.Timer timer = new javax.swing.Timer(gui.getComputerMoveDelayMs(), new java.awt.event.ActionListener() {
+            @Override
+            public void actionPerformed(java.awt.event.ActionEvent e) {
+                ComputersMove();
+            }
+        });
+        timer.setRepeats(false);
+        timer.start();
     }
 
     private boolean isPlayerVsPlayerMode() {
@@ -403,6 +425,7 @@ public class Board extends JPanel
                 undoSingleMove();
             }
 
+            computerMovePending = false;
             currentPlayer = PLAYER_X;
             gui.move = "Player";
             gui.moveLabel.setText("Move : " + gui.move);

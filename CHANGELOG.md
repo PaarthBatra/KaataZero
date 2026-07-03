@@ -5,6 +5,23 @@ All notable changes to the KaataZero project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.0.0] - 2026-07-04
+
+### Added
+- 2 Player local mode, difficulty modes (Easy, Medium, Hard), and computer move delay
+- Winning-line highlight, restart, undo, reset, keyboard shortcuts, and in-window results
+- Session and persistent win/loss/draw statistics
+- Settings dialog for mode, difficulty, starter, sound, and skin selection
+- UI skins (Classic, Midnight, Ocean, Forest, Candy) and How to Play help
+- Clickable website link on the main screen and bottom bar
+- Logic tests, installer EXE launcher support, and saved user preferences
+
+### Changed
+- Refactored `callGUI` to `CallGUI` with cleaner bottom toolbar layout
+- Updated About dialog email and website details
+- Improved AI balance across difficulty levels and scoring rules
+- Refreshed README, bundled README.TXT, and source-level documentation
+
 ## [1.0.1] - 2025-10-12
 
 ### Changed
